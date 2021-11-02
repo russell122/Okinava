@@ -43,26 +43,33 @@ document.addEventListener('DOMContentLoaded', function () {
   var customCheckboxBigBgValue = document.querySelectorAll('.custom-checkbox-bigBgValue');
   var customCheckboxBigBgValueInp = document.querySelectorAll('.custom-checkbox-bigBgValue > input');
   var fullPrice = document.querySelector('.cards__item-priceSet');
-  var cardsInt2 = document.querySelector('.cards__int2'); // console.log(cardsInt2.value)
-
+  var cardsInt2 = document.querySelector('.cards__int2');
   customCheckboxBigBgValueInp.forEach(function (el) {
     if (el.checked) {
-      fullPrice.innerHTML = +fullPrice.innerHTML + +e.target.getAttribute('data-price') * +cardsInt2.value;
-      fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value); // console.log(cardsInt2.value)
+      calcAmountGoodsIncludingToppings('plus', e.target);
     }
   });
   customCheckboxBigBgValue.forEach(function (el) {
     el.addEventListener('change', function (e) {
       if (e.target.checked) {
-        fullPrice.innerHTML = +fullPrice.innerHTML + +e.target.getAttribute('data-price') * +cardsInt2.value;
-        fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value); // console.log(cardsInt2.value)
+        calcAmountGoodsIncludingToppings('plus', e.target);
       } else {
-        fullPrice.innerHTML = +fullPrice.innerHTML - +e.target.getAttribute('data-price') * +cardsInt2.value;
-        fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value); // console.log(cardsInt2.value)
+        calcAmountGoodsIncludingToppings('minus', e.target);
       }
     });
-  }); // end Чекинг топингов в воке и подсчета суммы
+  });
+
+  var calcAmountGoodsIncludingToppings = function calcAmountGoodsIncludingToppings(condition, target) {
+    if (condition == 'plus') {
+      fullPrice.innerHTML = +fullPrice.innerHTML + +target.getAttribute('data-price') * +cardsInt2.value;
+      fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value);
+    } else if (condition == 'minus') {
+      fullPrice.innerHTML = +fullPrice.innerHTML - +target.getAttribute('data-price') * +cardsInt2.value;
+      fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value);
+    }
+  }; // end Чекинг топингов в воке и подсчета суммы
   // Наращивание кол-ва товаров при клике и подсчет
+
 
   var productRampUp = function productRampUp(myWrap, myElems, myFullValue) {
     var wrap = document.querySelector(myWrap);
@@ -310,9 +317,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var headerList = document.querySelector('.header__list');
   window.addEventListener('scroll', function (e) {
     // console.log(window.pageYOffset)
-    var header = $('.header');
-    var hederHeight = header.height(); // вычисляем высоту шапки
-
     if (headerBottom) {
       if (window.pageYOffset > 80 && screen.width >= 991) {
         headerBottom.classList.add('active');
@@ -320,18 +324,14 @@ document.addEventListener('DOMContentLoaded', function () {
         headerTopHeartWrap.classList.add('active');
         headerTopProductsWrap.classList.add('active');
         headerBottomHiddenLogo.classList.add('active');
-        headerList.classList.add('active'); // $('body').css({
-        // 	'paddingTop': hederHeight + 'px' // делаем отступ у body, равный высоте шапки
-        // });
+        headerList.classList.add('active');
       } else {
         headerBottom.classList.remove('active');
         headerTopComparisonWrap.classList.remove('active');
         headerTopHeartWrap.classList.remove('active');
         headerTopProductsWrap.classList.remove('active');
         headerBottomHiddenLogo.classList.remove('active');
-        headerList.classList.remove('active'); // $('body').css({
-        // 	'paddingTop': 0 // удаляю отступ у body, равный высоте шапки
-        // })
+        headerList.classList.remove('active');
       }
     }
   });
@@ -626,20 +626,21 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {}
     });
   } // end Кастомная анимация, которая начинает срабатывать когда юзер докрутит до этого блока
+  // Отмена стандартного поведения при клике
 
 
-  var less = document.querySelectorAll('.less');
-  less.forEach(function (el) {
-    el.addEventListener('click', function (e) {
-      e.preventDefault();
+  var cancelClickBehavior = function cancelClickBehavior(elemsLink) {
+    var elems = document.querySelectorAll(elemsLink);
+    elems.forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+      });
     });
-  });
-  var more = document.querySelectorAll('.more');
-  more.forEach(function (el) {
-    el.addEventListener('click', function (e) {
-      e.preventDefault();
-    });
-  }); // Маска
+  };
+
+  cancelClickBehavior('.less');
+  cancelClickBehavior('.more'); // Конец отмены стандартного поведения при клике
+  // Маска
 
   var numbersPhone = document.querySelectorAll('.numbersPhone');
   var maskOptionsPhone = {
@@ -650,8 +651,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }); // end Маска
 });
 $(document).ready(function () {
-  $('#InputID').inputmask("99:99"); // Кастомная анимация, которая начинает срабатывать когда юзер докрутит до этого блока
-
+  // Кастомная анимация, которая начинает срабатывать когда юзер докрутит до этого блока
   var $element = $('.footer');
   var counter = 0;
   $(window).scroll(function () {
@@ -664,6 +664,45 @@ $(document).ready(function () {
       $('.footer').removeClass("active");
     }
   }); // end Кастомная анимация, которая начинает срабатывать когда юзер докрутит до этого блока
+  // При клике на покупку товара изображение летит в корзину
+
+  function showAnimationAddNewProduct(target, wrapLink) {
+    $(target).on('click', function (e) {
+      e.preventDefault();
+
+      if ($(window).width() > 992) {
+        var that = $(this).closest(wrapLink).find('img');
+        var bascket = $(".header__top-products-comparison");
+        var w = that.width();
+        that.clone().css({
+          'width': w,
+          'position': 'absolute',
+          'z-index': '9999',
+          top: that.offset().top,
+          left: that.offset().left
+        }).appendTo("body").animate({
+          opacity: 0.05,
+          left: bascket.offset()['left'],
+          top: bascket.offset()['top'],
+          width: 20
+        }, 1000, function () {
+          $(this).remove();
+        });
+      } else {
+        $('.header__top-comparison-products-el').addClass("act");
+        setTimeout(function () {
+          $('.header__top-comparison-products-el').removeClass("act");
+        }, 800);
+      }
+    });
+  }
+
+  showAnimationAddNewProduct('.cards__item-bottom-mark', '.cards__item');
+  showAnimationAddNewProduct('.cards__item-bottom-mark2', '.assembly'); // end При клике на покупку товара изображение летит в корзину
+  // Маска
+
+  $('#InputID').inputmask("99:99"); // Конец маски
+  // Скролл по клику
 
   $(".js-scroll-to-form").click(function (event) {
     //отменяем стандартную обработку нажатия по ссылке
@@ -678,7 +717,8 @@ $(document).ready(function () {
     }, 1000);
     $('.header__burger, .header__menu').removeClass('active');
     $('body').removeClass('lock');
-  });
+  }); // Конец скролла 
+
   $('.open-magn').magnificPopup({
     type: 'image',
     closeOnContentClick: true,
@@ -694,67 +734,7 @@ $(document).ready(function () {
       duration: 300 // don't foget to change the duration also in CSS
 
     }
-  }); // При клике на покупку товара изображение летит в корзину
-
-  $('.cards__item-bottom-mark').on('click', function (e) {
-    e.preventDefault();
-
-    if ($(window).width() > 992) {
-      var that = $(this).closest('.cards__item').find('img');
-      var bascket = $(".header__top-products-comparison");
-      var w = that.width();
-      that.clone().css({
-        'width': w,
-        'position': 'absolute',
-        'z-index': '9999',
-        top: that.offset().top,
-        left: that.offset().left
-      }).appendTo("body").animate({
-        opacity: 0.05,
-        left: bascket.offset()['left'],
-        top: bascket.offset()['top'],
-        width: 20
-      }, 1000, function () {
-        $(this).remove();
-      });
-    } else {
-      $('.header__top-comparison-products-el').addClass("act");
-      setTimeout(function () {
-        $('.header__top-comparison-products-el').removeClass("act");
-      }, 800);
-    }
-  }); // end При клике на покупку товара изображение летит в корзину
-  // При клике на покупку товара изображение летит в корзину (второй такой же код)
-
-  $('.cards__item-bottom-mark2').on('click', function (e) {
-    e.preventDefault();
-
-    if ($(window).width() > 992) {
-      var that = $(this).closest('.assembly').find('img');
-      var bascket = $(".header__top-products-comparison");
-      var w = that.width();
-      that.clone().css({
-        'width': w,
-        'position': 'absolute',
-        'z-index': '9999',
-        top: that.offset().top,
-        left: that.offset().left
-      }).appendTo("body").animate({
-        opacity: 0.05,
-        left: bascket.offset()['left'],
-        top: bascket.offset()['top'],
-        width: 20
-      }, 1000, function () {
-        $(this).remove();
-      });
-    } else {
-      $('.header__top-comparison-products-el').addClass("act");
-      setTimeout(function () {
-        $('.header__top-comparison-products-el').removeClass("act");
-      }, 800);
-    }
-  }); // end При клике на покупку товара изображение летит в корзину (второй такой же код)
-
+  });
   var wow = new WOW({
     boxClass: 'wow',
     // animated element css class (default is wow)
@@ -779,7 +759,7 @@ $(document).ready(function () {
     $('.header__burger, .header__mnu').toggleClass('active');
     $('body').toggleClass('lock');
   });
-  var swiper = new Swiper('.works__slider', {
+  var works__slider = new Swiper('.works__slider', {
     autoHeight: true,
     centeredSlides: true,
     initialSlide: 0,
@@ -821,7 +801,7 @@ $(document).ready(function () {
     // },
 
   });
-  var slider2 = new Swiper('.reviews__slider', {
+  var reviews__slider = new Swiper('.reviews__slider', {
     autoHeight: true,
     slidesPerView: 3,
     spaceBetween: 20,
@@ -863,7 +843,7 @@ $(document).ready(function () {
     // },
 
   });
-  var slider3 = new Swiper('.news__slider', {
+  var news__slider = new Swiper('.news__slider', {
     // autoHeight: true,
     slidesPerView: 2,
     spaceBetween: 20,
