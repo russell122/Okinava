@@ -44,6 +44,17 @@ document.addEventListener('DOMContentLoaded', function () {
   var customCheckboxBigBgValueInp = document.querySelectorAll('.custom-checkbox-bigBgValue > input');
   var fullPrice = document.querySelector('.cards__item-priceSet');
   var cardsInt2 = document.querySelector('.cards__int2');
+
+  var calcAmountGoodsIncludingToppings = function calcAmountGoodsIncludingToppings(condition, target) {
+    if (condition == 'plus') {
+      fullPrice.innerHTML = +fullPrice.innerHTML + +target.getAttribute('data-price') * +cardsInt2.value;
+      fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value);
+    } else if (condition == 'minus') {
+      fullPrice.innerHTML = +fullPrice.innerHTML - +target.getAttribute('data-price') * +cardsInt2.value;
+      fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value);
+    }
+  };
+
   customCheckboxBigBgValueInp.forEach(function (el) {
     if (el.checked) {
       calcAmountGoodsIncludingToppings('plus', e.target);
@@ -57,19 +68,8 @@ document.addEventListener('DOMContentLoaded', function () {
         calcAmountGoodsIncludingToppings('minus', e.target);
       }
     });
-  });
-
-  var calcAmountGoodsIncludingToppings = function calcAmountGoodsIncludingToppings(condition, target) {
-    if (condition == 'plus') {
-      fullPrice.innerHTML = +fullPrice.innerHTML + +target.getAttribute('data-price') * +cardsInt2.value;
-      fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value);
-    } else if (condition == 'minus') {
-      fullPrice.innerHTML = +fullPrice.innerHTML - +target.getAttribute('data-price') * +cardsInt2.value;
-      fullPrice.setAttribute('data-vvl', fullPrice.innerHTML / +cardsInt2.value);
-    }
-  }; // end Чекинг топингов в воке и подсчета суммы
+  }); // end Чекинг топингов в воке и подсчета суммы
   // Наращивание кол-ва товаров при клике и подсчет
-
 
   var productRampUp = function productRampUp(myWrap, myElems, myFullValue) {
     var wrap = document.querySelector(myWrap);
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
   productRampUp('.cards__item-bottom', '.cards__int2', '.cards__item-priceSet'); // Конец Наращивания кол-ва товаров при клике и подсчета
   // Рассчеты в корзине
 
-  var productRampUp2 = function productRampUp2(myWrap, myElems, myPrice, myFullValue) {
+  var productRampUpBasket = function productRampUpBasket(myWrap, myElems, myPrice, myFullValue) {
     var wrap = document.querySelector(myWrap);
     var elems = document.querySelectorAll(myElems);
     var price = document.querySelectorAll(myPrice);
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   };
 
-  productRampUp2('.basketPay__right1', '.cards__int2', '.cards__item-priceJS', '.cards__item-price-FULL'); // end Рассчеты в корзине
+  productRampUpBasket('.basketPay__right1', '.cards__int2', '.cards__item-priceJS', '.cards__item-price-FULL'); // end Рассчеты в корзине
   // Вырезание и вставка элементов
 
   var footerWrapBottom = document.querySelector('.footer__wrap-bottom');
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   myProlapse(); // end accordion
-  // Даю и снимаю класс у чекбоксов и кадио
+  // Добавляю и убираю класс у чекбоксов и радио
 
   var customCheckboxBig = document.querySelectorAll('.custom-checkbox-big');
   var sp = document.querySelectorAll('.custom-checkbox-big > span');
